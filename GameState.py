@@ -14,9 +14,9 @@ cookie = None
 lastTime = None
 deltaTime = None
 currentTime = None
-jellys = None
+Jellies = None
 
-#JImage = load_image('JELLY.png')
+jellyImage = None
 
 
 class Cookie:
@@ -27,7 +27,7 @@ class Cookie:
         self.dir = 1
         self.height = int(229)
         self.width = int(283)
-        self.speed = 5
+        self.speed = 40
         self.accY = 0
         self.gravity = 140
         self.jumpCount = 0
@@ -48,7 +48,7 @@ class Cookie:
     def draw(self):
         self.image.clip_draw(self.frame * self.width, self.height * 3,  self.width, self.height, 50 , self.y,
                              self.width*0.7, self.height*0.7)
-        #print(self.x)
+
 
 class Jelly:
     def __init__self(self):
@@ -58,7 +58,9 @@ class Jelly:
         pass
 
     def draw(self):
-        self.image.clip_draw(self.type * self.width, 1936, self.width,self.height ,self.x,self.y)
+        global jellyImage
+        global cookie
+        jellyImage.clip_draw(68 * self.type ,0, 62 ,62,self.x - cookie.x,self.y,30,30)
 
     def setPos(self, x, y):
         self.x = x
@@ -71,22 +73,26 @@ class Jelly:
 
 
 def enter():
-    global cookie, lastTime,jellys
+    global cookie, lastTime,jellys,jellyImage
+
     lastTime = time.time()
     cookie = Cookie()
     jellys = list()
     for i in range(10000):
         tempJelly = Jelly()
-        tempJelly.setPos(i*10 + 50,90)
-        tempJelly.setType(random.randint(0,30))
+        tempJelly.setPos(i*40 + 300,70)
+        tempJelly.setType(random.randint(0,24))
         jellys.append(tempJelly)
     for i in jellys:
-        print(i.x)
+        print(i.x , i.y)
+
+    jellyImage = load_image('Jelly.png')
 
 
 def exit():
     global cookie
     del(cookie)
+
 
 
 def pause():
@@ -126,9 +132,13 @@ def draw():
     global cookie,jellys
 
     clear_canvas()
-    #for jelly in jellys:
-    #     if 0 < jelly.x - cookie.x < 800:
-    #        jelly.draw()
+    for jelly in jellys:
+        if 0 < jelly.x - cookie.x < 800:
+            jelly.draw()
+        elif jelly.x - cookie.x < 0 :
+            jellys.remove(jelly)
+            print("remove far Jelly")
+
     cookie.draw()
     update_canvas()
     delay(0.1)
