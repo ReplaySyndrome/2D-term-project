@@ -14,19 +14,22 @@ cookie = None
 lastTime = None
 deltaTime = None
 currentTime = None
+jellys = None
+
+#JImage = load_image('JELLY.png')
 
 
 class Cookie:
     def __init__(self):
         self.x, self.y = 50, 90
         self.frame = 0
-        self.image = load_image('114550.png')
+        self.image = load_image('DJCookie.png')
         self.dir = 1
         self.height = int(229)
         self.width = int(283)
         self.speed = 5
         self.accY = 0
-        self.gravity = 40
+        self.gravity = 140
         self.jumpCount = 0
 
     def update(self):
@@ -45,13 +48,40 @@ class Cookie:
     def draw(self):
         self.image.clip_draw(self.frame * self.width, self.height * 3,  self.width, self.height, 50 , self.y,
                              self.width*0.7, self.height*0.7)
-        print(self.x)
+        #print(self.x)
+
+class Jelly:
+    def __init__self(self):
+        self.width = 69
+        self.height = 68
+    def update(self):
+        pass
+
+    def draw(self):
+        self.image.clip_draw(self.type * self.width, 1936, self.width,self.height ,self.x,self.y)
+
+    def setPos(self, x, y):
+        self.x = x
+        self.y = y
+
+    def setType(self, type):
+        self.type = type
+
+
 
 
 def enter():
-    global cookie, lastTime
+    global cookie, lastTime,jellys
     lastTime = time.time()
     cookie = Cookie()
+    jellys = list()
+    for i in range(10000):
+        tempJelly = Jelly()
+        tempJelly.setPos(i*10 + 50,90)
+        tempJelly.setType(random.randint(0,30))
+        jellys.append(tempJelly)
+    for i in jellys:
+        print(i.x)
 
 
 def exit():
@@ -77,7 +107,7 @@ def handle_events():
         elif event.type == SDL_KEYDOWN:
             if event.key == SDLK_SPACE:
                 if cookie.jumpCount < 2:
-                    cookie.accY = 30
+                    cookie.accY = 60
                     cookie.jumpCount += 1
                     print("PRESS SPACE")
 
@@ -93,8 +123,12 @@ def update():
 
 
 def draw():
-    clear_canvas()
+    global cookie,jellys
 
+    clear_canvas()
+    #for jelly in jellys:
+    #     if 0 < jelly.x - cookie.x < 800:
+    #        jelly.draw()
     cookie.draw()
     update_canvas()
     delay(0.1)
