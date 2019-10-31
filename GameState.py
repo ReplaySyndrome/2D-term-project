@@ -17,7 +17,7 @@ currentTime = None
 Jellies = None
 background = None
 jellyImage = None
-posX = 10
+
 
 
 class Cookie:
@@ -85,15 +85,17 @@ class Jelly:
 class BackGround:
     def __init__(self):
         self.image = load_image("BackGround.png")
-        self.posX = 0
-        self.speedX = 0.000001
+        self.positionX = 0
+        self.speedX = 15
 
     def update(self):
         global deltaTime
-        self.posX += deltaTime * self.speedX
+        self.positionX = self.positionX + deltaTime * self.speedX
 
     def draw(self):
-        self.image.clip_draw(2 + int(posX), 4686 - 1010, 400, 318, 400, 300, 800, 600)
+        global deltaTime
+        #print(self.positionX, deltaTime)
+        self.image.clip_draw(2 + int(self.positionX), 4686 - 1010, 200, 318, 400, 300, 800, 600)
 
 
 
@@ -103,22 +105,20 @@ def enter():
     lastTime = time.time()
     cookie = Cookie()
     Jellies = list()
-    for i in range(10000):
+    for i in range(100000):
         tempJelly = Jelly()
         tempJelly.setPos(i*40 + 300, 70)
         tempJelly.setType(random.randint(0, 24))
         Jellies.append(tempJelly)
-    for i in Jellies:
-        print(i.x , i.y)
+    #for i in Jellies:
+    #    print(i.x , i.y)
 
     jellyImage = load_image('Jelly.png')
     background = BackGround()
 
 
 def exit():
-    global cookie
-    del(cookie)
-
+    pass
 
 
 def pause():
@@ -158,25 +158,25 @@ def handle_events():
 
 
 def update():
-    global currentTime, deltaTime, lastTime, cookie
+    global currentTime, deltaTime, lastTime, cookie,background
     currentTime = time.time()
     deltaTime = currentTime - lastTime
     lastTime = currentTime
     #print(deltaTime)
+    background.update()
     cookie.update()
 
 
 def draw():
-    global cookie, Jellies,background,posX
+    global cookie, Jellies,background
     clear_canvas()
-    posX += deltaTime * 50
     background.draw()
     for jelly in Jellies:
         if 0 < jelly.x - cookie.x < 800:
             jelly.draw()
         elif jelly.x - cookie.x < 0:
             Jellies.remove(jelly)
-            print("remove far Jelly")
+            #print("remove far Jelly")
         elif jelly.x - cookie.x >= 1000:
             break
 
