@@ -15,7 +15,7 @@ lastTime = None
 deltaTime = None
 currentTime = None
 Jellies = None
-BackGround = None
+background = None
 jellyImage = None
 posX = 10
 
@@ -82,25 +82,37 @@ class Jelly:
     def setType(self, type):
         self.type = type
 
+class BackGround:
+    def __init__(self):
+        self.image = load_image("BackGround.png")
+        self.posX = 0
+        self.speedX = 0.000001
+
+    def update(self):
+        global deltaTime
+        self.posX += deltaTime * self.speedX
+
+    def draw(self):
+        self.image.clip_draw(2 + int(posX), 4686 - 1010, 400, 318, 400, 300, 800, 600)
 
 
 
 def enter():
-    global cookie, lastTime,Jellies,jellyImage,BackGround
+    global cookie, lastTime,Jellies,jellyImage,background
 
     lastTime = time.time()
     cookie = Cookie()
     Jellies = list()
     for i in range(10000):
         tempJelly = Jelly()
-        tempJelly.setPos(i*40 + 300,70)
-        tempJelly.setType(random.randint(0,24))
+        tempJelly.setPos(i*40 + 300, 70)
+        tempJelly.setType(random.randint(0, 24))
         Jellies.append(tempJelly)
     for i in Jellies:
         print(i.x , i.y)
 
     jellyImage = load_image('Jelly.png')
-    BackGround = load_image("BackGround.png")
+    background = BackGround()
 
 
 def exit():
@@ -155,16 +167,18 @@ def update():
 
 
 def draw():
-    global cookie, Jellies,BackGround,posX
+    global cookie, Jellies,background,posX
     clear_canvas()
     posX += deltaTime * 50
-    BackGround.clip_draw(2 + int(posX),4686 - 1010,800,318,400,300,800,600)
+    background.draw()
     for jelly in Jellies:
         if 0 < jelly.x - cookie.x < 800:
             jelly.draw()
         elif jelly.x - cookie.x < 0:
             Jellies.remove(jelly)
             print("remove far Jelly")
+        elif jelly.x - cookie.x >= 1000:
+            break
 
     cookie.draw()
     update_canvas()
