@@ -17,6 +17,8 @@ currentTime = None
 Jellies = None
 background = None
 jellyImage = None
+flyingObstacleImage = None
+flyingObstacles = None
 
 
 
@@ -28,7 +30,7 @@ class Cookie:
         self.dir = 1
         self.height = int(229)
         self.width = int(283)
-        self.speed = 100
+        self.speed = 150
         self.accY = 0
         self.gravity = 30
         self.jumpCount = 0
@@ -86,7 +88,7 @@ class BackGround:
     def __init__(self):
         self.image = load_image("BackGround.png")
         self.positionX = 0
-        self.speedX = 15
+        self.speedX = 1
 
     def update(self):
         global deltaTime
@@ -97,23 +99,55 @@ class BackGround:
         #print(self.positionX, deltaTime)
         self.image.clip_draw(2 + int(self.positionX), 4686 - 1010, 200, 318, 400, 300, 800, 600)
 
+class FlyingObstacle:
+    def __init__(self):
+        self.width = 123
+        self.height = 90
+        self.frame = 0
+        self.spriteSpeedPerSec = 20
+
+    def update(self):
+        global deltaTime
+        self.frame = (self.frame + deltaTime* self.spriteSpeedPerSec) % 3
+
+    def draw(self):
+        global flyingObstacleImage
+        flyingObstacleImage.clip_draw(self.width * int(self.frame),0,self.width,self.height,self.x - cookie.x,self.y)
+
+    def setPos(self,x,y):
+        self.x = x
+        self.y = y
+
+    def setType(self,type):
+        self.type = type
+
+
+
+
 
 
 def enter():
-    global cookie, lastTime,Jellies,jellyImage,background
+    global cookie, lastTime,Jellies,jellyImage,background,flyingObstacles,flyingObstacleImage
 
     lastTime = time.time()
     cookie = Cookie()
     Jellies = list()
     for i in range(100000):
         tempJelly = Jelly()
-        tempJelly.setPos(i*40 + 300, 70)
+        if 240 <= (i*40 + 300) % 400 <= 320:
+            tempJelly.setPos(i * 40 + 300, 40)
+        else:
+            tempJelly.setPos(i*40 + 300, 70)
         tempJelly.setType(random.randint(0, 24))
         Jellies.append(tempJelly)
-    #for i in Jellies:
-    #    print(i.x , i.y)
+    flyingObstacles = list()
+    for i in range(100):
+        temp = FlyingObstacle()
+        temp.setPos(i*400 - 100,150)
+        flyingObstacles.append(temp)
 
     jellyImage = load_image('Jelly.png')
+    flyingObstacleImage = load_image("FlyingObstacle1.png")
     background = BackGround()
 
 
@@ -158,11 +192,16 @@ def handle_events():
 
 
 def update():
-    global currentTime, deltaTime, lastTime, cookie,background
+    global currentTime, deltaTime, lastTime, cookie,background,flyingObstacles
     currentTime = time.time()
     deltaTime = currentTime - lastTime
     lastTime = currentTime
     #print(deltaTime)
+    for i in range (100):
+        flyingObstacles[i].update()
+        if flyingObstacles[i].x - cookie.x > 800:
+            break
+
     background.update()
     cookie.update()
 
@@ -179,6 +218,16 @@ def draw():
             #print("remove far Jelly")
         elif jelly.x - cookie.x >= 1000:
             break
+
+    for flyingObstacle in flyingObstacles:
+        if 0 < flyingObstacle.x - cookie.x < 800:
+            flyingObstacle.draw()
+        elif flyingObstacle.x - cookie.x < 0:
+            flyingObstacles.remove(flyingObstacle)
+            print("remove far Obstacle")
+        elif flyingObstacle.x - cookie.x >= 1000:
+            break
+
 
     cookie.draw()
     update_canvas()
