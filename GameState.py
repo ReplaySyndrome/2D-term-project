@@ -222,7 +222,7 @@ def draw():
     for flyingObstacle in flyingObstacles:
         if 0 < flyingObstacle.x - cookie.x < 800:
             flyingObstacle.draw()
-        elif flyingObstacle.x - cookie.x < 0:
+        elif flyingObstacle.x - cookie.x < -200:
             flyingObstacles.remove(flyingObstacle)
             print("remove far Obstacle")
         elif flyingObstacle.x - cookie.x >= 1000:
