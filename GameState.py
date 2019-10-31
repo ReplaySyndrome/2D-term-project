@@ -21,19 +21,26 @@ jellyImage = None
 
 class Cookie:
     def __init__(self):
-        self.x, self.y = 50, 90
+        self.x, self.y = 60, 90
         self.frame = 0
         self.image = load_image('DJCookie.png')
         self.dir = 1
         self.height = int(229)
         self.width = int(283)
-        self.speed = 40
+        self.speed = 100
         self.accY = 0
-        self.gravity = 140
+        self.gravity = 40
         self.jumpCount = 0
+        self.slide = False
+        self.spriteSpeedPerSec = 20
+        self.minY = 120
 
     def update(self):
-        self.frame = (self.frame + 1) % 4
+        if self.slide == True and self.accY == 0:
+            self.frame = (self.frame + self.spriteSpeedPerSec * deltaTime) % 2 + 11
+        else:
+            self.frame = (self.frame + self.spriteSpeedPerSec*deltaTime) % 4
+
         self.x += self.speed * deltaTime
         if self.accY != 0:
             self.y += self.accY
@@ -46,7 +53,12 @@ class Cookie:
 
 
     def draw(self):
-        self.image.clip_draw(self.frame * self.width, self.height * 3,  self.width, self.height, 50 , self.y,
+
+        if self.slide == True and self.accY == 0:
+            self.image.clip_draw(int(self.frame) * self.width, self.height * 4, self.width, self.height, 60, self.y,
+                                 self.width * 0.7, self.height * 0.7)
+        else:
+            self.image.clip_draw(int(self.frame) * self.width, self.height * 3,  self.width, self.height, 60 , self.y,
                              self.width*0.7, self.height*0.7)
 
 
@@ -113,9 +125,21 @@ def handle_events():
         elif event.type == SDL_KEYDOWN:
             if event.key == SDLK_SPACE:
                 if cookie.jumpCount < 2:
-                    cookie.accY = 60
+                    cookie.accY = 10
                     cookie.jumpCount += 1
                     print("PRESS SPACE")
+
+            if event.key == SDLK_j:
+                cookie.slide = True
+                print("PRESS J")
+
+        elif event.type == SDL_KEYUP:
+            if event.key == SDLK_j:
+                cookie.slide = False
+                print("UP J")
+
+
+
 
 
 
@@ -141,4 +165,4 @@ def draw():
 
     cookie.draw()
     update_canvas()
-    delay(0.1)
+
