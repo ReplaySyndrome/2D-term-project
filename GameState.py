@@ -15,13 +15,14 @@ lastTime = None
 deltaTime = None
 currentTime = None
 Jellies = None
-
+BackGround = None
 jellyImage = None
+posX = 10
 
 
 class Cookie:
     def __init__(self):
-        self.x, self.y = 60, 90
+        self.x, self.y = 60, 120
         self.frame = 0
         self.image = load_image('DJCookie.png')
         self.dir = 1
@@ -29,7 +30,7 @@ class Cookie:
         self.width = int(283)
         self.speed = 100
         self.accY = 0
-        self.gravity = 40
+        self.gravity = 30
         self.jumpCount = 0
         self.slide = False
         self.spriteSpeedPerSec = 20
@@ -46,8 +47,8 @@ class Cookie:
             self.y += self.accY
             self.accY -= self.gravity*deltaTime
 
-        if self.y < 89:
-            self.y = 90
+        if self.y < self.minY:
+            self.y = self.minY
             self.accY = 0
             self.jumpCount = 0
 
@@ -55,7 +56,7 @@ class Cookie:
     def draw(self):
 
         if self.slide == True and self.accY == 0:
-            self.image.clip_draw(int(self.frame) * self.width, self.height * 4, self.width, self.height, 60, self.y,
+            self.image.clip_draw(int(self.frame) * self.width, self.height * 4, self.width, self.height, 60, self.minY,
                                  self.width * 0.7, self.height * 0.7)
         else:
             self.image.clip_draw(int(self.frame) * self.width, self.height * 3,  self.width, self.height, 60 , self.y,
@@ -72,7 +73,7 @@ class Jelly:
     def draw(self):
         global jellyImage
         global cookie
-        jellyImage.clip_draw(68 * self.type ,0, 62 ,62,self.x - cookie.x,self.y,30,30)
+        jellyImage.clip_draw(68 * self.type ,0, 62 ,62,self.x - cookie.x,self.y + 23,30,30)
 
     def setPos(self, x, y):
         self.x = x
@@ -85,20 +86,21 @@ class Jelly:
 
 
 def enter():
-    global cookie, lastTime,jellys,jellyImage
+    global cookie, lastTime,Jellies,jellyImage,BackGround
 
     lastTime = time.time()
     cookie = Cookie()
-    jellys = list()
+    Jellies = list()
     for i in range(10000):
         tempJelly = Jelly()
         tempJelly.setPos(i*40 + 300,70)
         tempJelly.setType(random.randint(0,24))
-        jellys.append(tempJelly)
-    for i in jellys:
+        Jellies.append(tempJelly)
+    for i in Jellies:
         print(i.x , i.y)
 
     jellyImage = load_image('Jelly.png')
+    BackGround = load_image("BackGround.png")
 
 
 def exit():
@@ -125,7 +127,7 @@ def handle_events():
         elif event.type == SDL_KEYDOWN:
             if event.key == SDLK_SPACE:
                 if cookie.jumpCount < 2:
-                    cookie.accY = 10
+                    cookie.accY = 7
                     cookie.jumpCount += 1
                     print("PRESS SPACE")
 
@@ -153,14 +155,15 @@ def update():
 
 
 def draw():
-    global cookie,jellys
-
+    global cookie, Jellies,BackGround,posX
     clear_canvas()
-    for jelly in jellys:
+    posX += deltaTime * 50
+    BackGround.clip_draw(2 + int(posX),4686 - 1010,800,318,400,300,800,600)
+    for jelly in Jellies:
         if 0 < jelly.x - cookie.x < 800:
             jelly.draw()
-        elif jelly.x - cookie.x < 0 :
-            jellys.remove(jelly)
+        elif jelly.x - cookie.x < 0:
+            Jellies.remove(jelly)
             print("remove far Jelly")
 
     cookie.draw()
