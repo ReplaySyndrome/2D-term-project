@@ -19,7 +19,8 @@ background = None
 jellyImage = None
 flyingObstacleImage = None
 flyingObstacles = None
-
+groundImage = None
+grounds = None
 
 
 class Cookie:
@@ -122,16 +123,45 @@ class FlyingObstacle:
         self.type = type
 
 
+class Ground:
+    def __init__(self):
+        self.x = 0
+        self.y = 0
+
+    def draw(self):
+        global groundImage
+        groundImage.draw(self.x - cookie.x,self.y)
+
+    def update(self):
+        pass
+
+    def setType(self,type):
+        self.type = type
+
+    def setPos(self,x,y):
+        self.x = x
+        self.y = y
+
+
+
 
 
 
 
 def enter():
-    global cookie, lastTime,Jellies,jellyImage,background,flyingObstacles,flyingObstacleImage
+    global cookie, lastTime,Jellies,jellyImage,background,flyingObstacles,flyingObstacleImage,groundImage,grounds
 
     lastTime = time.time()
     cookie = Cookie()
     Jellies = list()
+    grounds =  list()
+
+    for i in range(100000):
+        tempGround = Ground()
+        tempGround.setPos(124*i,-20)
+        grounds.append(tempGround)
+
+
     for i in range(100000):
         tempJelly = Jelly()
         if 240 <= (i*40 + 300) % 400 <= 320:
@@ -148,6 +178,7 @@ def enter():
 
     jellyImage = load_image('Jelly.png')
     flyingObstacleImage = load_image("FlyingObstacle1.png")
+    groundImage = load_image("Ground.png")
     background = BackGround()
 
 
@@ -224,10 +255,18 @@ def draw():
             flyingObstacle.draw()
         elif flyingObstacle.x - cookie.x < -200:
             flyingObstacles.remove(flyingObstacle)
-            print("remove far Obstacle")
+            #print("remove far Obstacle")
         elif flyingObstacle.x - cookie.x >= 1000:
             break
 
+    for ground in grounds:
+        if -200 < ground.x - cookie.x < 1000:
+            ground.draw()
+        elif ground.x - cookie.x < -400:
+            grounds.remove(ground)
+            print("remove far Obstacle")
+        elif ground.x - cookie.x >= 1000:
+            break
 
     cookie.draw()
     update_canvas()
