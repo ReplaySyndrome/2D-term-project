@@ -21,6 +21,7 @@ flyingObstacleImage = None
 flyingObstacles = None
 groundImage = None
 grounds = None
+hp_bar = None
 
 
 class Cookie:
@@ -31,9 +32,9 @@ class Cookie:
         self.dir = 1
         self.height = int(229)
         self.width = int(283)
-        self.speed = 150
+        self.speed = 320
         self.accY = 0
-        self.gravity = 30
+        self.gravity = 28
         self.jumpCount = 0
         self.slide = False
         self.spriteSpeedPerSec = 20
@@ -142,6 +143,30 @@ class Ground:
         self.x = x
         self.y = y
 
+class HPBar:
+    def __init__(self):
+        self.bar_image = load_image("HPBar.png")
+        self.hp_bottleimage = load_image("hpbottle.png")
+        self.x = 400
+        self.y = 550
+        self.reducehp = 0
+        self.reduce_speed = 10
+
+    def draw(self):
+
+        self.bar_image.draw(self.x +self.reducehp/2,self.y,600 + self.reducehp , 50)
+        self.hp_bottleimage.draw(self.x - 275, self.y + 10)
+        print(self.reducehp)
+
+    def update(self):
+        global deltaTime
+        self.reducehp -= deltaTime*self.reduce_speed
+        if self.reducehp < -600:
+            print("End Game")
+            game_framework.pop_state()
+
+
+
 
 
 
@@ -149,7 +174,7 @@ class Ground:
 
 
 def enter():
-    global cookie, lastTime,Jellies,jellyImage,background,flyingObstacles,flyingObstacleImage,groundImage,grounds
+    global cookie, lastTime,Jellies,jellyImage,background,flyingObstacles,flyingObstacleImage,groundImage,grounds,hp_bar
 
     lastTime = time.time()
     cookie = Cookie()
@@ -180,7 +205,7 @@ def enter():
     flyingObstacleImage = load_image("FlyingObstacle1.png")
     groundImage = load_image("Ground.png")
     background = BackGround()
-
+    hp_bar = HPBar()
 
 def exit():
     pass
@@ -232,7 +257,7 @@ def update():
         flyingObstacles[i].update()
         if flyingObstacles[i].x - cookie.x > 800:
             break
-
+    hp_bar.update()
     background.update()
     cookie.update()
 
@@ -251,9 +276,9 @@ def draw():
             break
 
     for flyingObstacle in flyingObstacles:
-        if 0 < flyingObstacle.x - cookie.x < 800:
+        if -600 < flyingObstacle.x - cookie.x < 800:
             flyingObstacle.draw()
-        elif flyingObstacle.x - cookie.x < -200:
+        elif flyingObstacle.x - cookie.x < -600:
             flyingObstacles.remove(flyingObstacle)
             #print("remove far Obstacle")
         elif flyingObstacle.x - cookie.x >= 1000:
@@ -264,10 +289,11 @@ def draw():
             ground.draw()
         elif ground.x - cookie.x < -400:
             grounds.remove(ground)
-            print("remove far Obstacle")
+            #print("remove far ground")
         elif ground.x - cookie.x >= 1000:
             break
 
+    hp_bar.draw()
     cookie.draw()
     update_canvas()
 
