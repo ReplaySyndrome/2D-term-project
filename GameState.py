@@ -55,6 +55,8 @@ class Cookie:
         self.minY = 120
         self.cookiewidth = 70
         self.cookieheight = 96
+        self.iscollide = False
+        self.collTime = None
 
     def update(self):
         if self.slide == True and self.accY == 0:
@@ -74,7 +76,7 @@ class Cookie:
 
 
     def draw(self):
-
+        
         if self.slide == True and self.accY == 0:
             self.image.clip_draw(int(self.frame) * self.width, self.height * 4, self.width, self.height, 60, self.minY,
                                  self.width * 0.7, self.height * 0.7)
@@ -92,7 +94,7 @@ class Jelly:
     def __init__(self):
         self.width = 69
         self.height = 68
-        self.score = 100
+        self.score = 186
     def update(self):
         pass
 
@@ -141,13 +143,18 @@ class FlyingObstacle:
     def draw(self):
         global flyingObstacleImage
         flyingObstacleImage.clip_draw(self.width * int(self.frame),0,self.width,self.height,self.x - cookie.x,self.y)
-
+        draw_rectangle(self.x - cookie.x - 40,self.y - 28,self.x -cookie.x + 40,self.y + 28)
     def setPos(self,x,y):
         self.x = x
         self.y = y
 
     def setType(self,type):
         self.type = type
+
+    def get_bb(self):
+        return self.x - 40,self.y - 28,self.x+40,self.y + 28
+
+
 
 
 class Ground:
@@ -302,7 +309,7 @@ def update():
 
 
 def draw():
-    global cookie, Jellies, background,score
+    global cookie, Jellies, background,score,hp_bar
     clear_canvas()
     background.draw()
     for jelly in Jellies:
@@ -322,7 +329,10 @@ def draw():
             break
 
     for flyingObstacle in flyingObstacles:
-        if -600 < flyingObstacle.x - cookie.x < 800:
+        if collide(cookie,flyingObstacle):
+            hp_bar.reducehp -=0.3
+            flyingObstacle.draw()
+        elif -600 < flyingObstacle.x - cookie.x < 800:
             flyingObstacle.draw()
         elif flyingObstacle.x - cookie.x < -600:
             flyingObstacles.remove(flyingObstacle)
