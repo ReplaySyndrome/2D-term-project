@@ -22,6 +22,20 @@ flyingObstacles = None
 groundImage = None
 grounds = None
 hp_bar = None
+score = None
+
+def collide(a, b):
+    left_a, bottom_a, right_a, top_a = a.get_bb()
+    left_b, bottom_b, right_b, top_b = b.get_bb()
+    if left_a > right_b:
+        return False
+    if right_a < left_b:
+        return False
+    if top_a < bottom_b:
+        return False
+    if bottom_a > top_b:
+        return False
+    return True
 
 
 class Cookie:
@@ -34,11 +48,13 @@ class Cookie:
         self.width = int(283)
         self.speed = 320
         self.accY = 0
-        self.gravity = 28
+        self.gravity = 10
         self.jumpCount = 0
         self.slide = False
         self.spriteSpeedPerSec = 20
         self.minY = 120
+        self.cookiewidth = 70
+        self.cookieheight = 96
 
     def update(self):
         if self.slide == True and self.accY == 0:
@@ -66,11 +82,17 @@ class Cookie:
             self.image.clip_draw(int(self.frame) * self.width, self.height * 3,  self.width, self.height, 60 , self.y,
                              self.width*0.7, self.height*0.7)
 
+        draw_rectangle(60-self.cookiewidth/2,self.y -self.cookieheight/2 - 40,60+self.cookiewidth/2,self.y+self.cookieheight/2 - 40)
+
+    def get_bb(self):
+        return self.x - self.cookiewidth/2,self.y - self.cookieheight/2 - 40,self.x + self.cookiewidth/2,self.y + self.cookieheight/2 - 40
+
 
 class Jelly:
-    def __init__self(self):
+    def __init__(self):
         self.width = 69
         self.height = 68
+        self.score = 100
     def update(self):
         pass
 
@@ -78,6 +100,7 @@ class Jelly:
         global jellyImage
         global cookie
         jellyImage.clip_draw(68 * self.type ,0, 62 ,62,self.x - cookie.x,self.y + 23,30,30)
+        draw_rectangle(self.x - 15 - cookie.x,self.y - 15 + 25, self.x +15 - cookie.x , self.y + 15 + 25)
 
     def setPos(self, x, y):
         self.x = x
@@ -85,6 +108,9 @@ class Jelly:
 
     def setType(self, type):
         self.type = type
+
+    def get_bb(self):
+        return self.x -15,self.y - 15 + 25,self.x + 15,self.y + 15 + 25
 
 class BackGround:
     def __init__(self):
@@ -156,7 +182,7 @@ class HPBar:
 
         self.bar_image.draw(self.x +self.reducehp/2,self.y,600 + self.reducehp , 50)
         self.hp_bottleimage.draw(self.x - 275, self.y + 10)
-        print(self.reducehp)
+        #print(self.reducehp)
 
     def update(self):
         global deltaTime
@@ -164,6 +190,16 @@ class HPBar:
         if self.reducehp < -600:
             print("End Game")
             game_framework.pop_state()
+
+class Score:
+    def __init__(self):
+        self.x = 700
+        self.y = 500
+        self.font = load_font('ENCR10B.TTF', 16)
+        self.currentscore = 0
+
+    def draw(self):
+        self.font.draw(self.x,self.y,str(self.currentscore),(255,255,0))
 
 
 
@@ -174,7 +210,7 @@ class HPBar:
 
 
 def enter():
-    global cookie, lastTime,Jellies,jellyImage,background,flyingObstacles,flyingObstacleImage,groundImage,grounds,hp_bar
+    global cookie, lastTime,Jellies,jellyImage,background,flyingObstacles,flyingObstacleImage,groundImage,grounds,hp_bar , score
 
     lastTime = time.time()
     cookie = Cookie()
@@ -206,6 +242,7 @@ def enter():
     groundImage = load_image("Ground.png")
     background = BackGround()
     hp_bar = HPBar()
+    score = Score()
 
 def exit():
     pass
@@ -229,17 +266,19 @@ def handle_events():
         elif event.type == SDL_KEYDOWN:
             if event.key == SDLK_SPACE:
                 if cookie.jumpCount < 2:
-                    cookie.accY = 7
+                    cookie.accY = 3.5
                     cookie.jumpCount += 1
                     print("PRESS SPACE")
 
             if event.key == SDLK_j:
                 cookie.slide = True
+                cookie.cookieheight = cookie.cookieheight /2
                 print("PRESS J")
 
         elif event.type == SDL_KEYUP:
             if event.key == SDLK_j:
                 cookie.slide = False
+                cookie.cookieheight = cookie.cookieheight *2
                 print("UP J")
 
 
@@ -263,11 +302,18 @@ def update():
 
 
 def draw():
-    global cookie, Jellies,background
+    global cookie, Jellies, background,score
     clear_canvas()
     background.draw()
     for jelly in Jellies:
-        if 0 < jelly.x - cookie.x < 800:
+
+        if collide(cookie,jelly):
+            #print("collide")
+            score.currentscore += jelly.score
+            Jellies.remove(jelly)
+
+
+        elif 0 < jelly.x - cookie.x < 800:
             jelly.draw()
         elif jelly.x - cookie.x < 0:
             Jellies.remove(jelly)
@@ -295,5 +341,6 @@ def draw():
 
     hp_bar.draw()
     cookie.draw()
+    score.draw()
     update_canvas()
 
