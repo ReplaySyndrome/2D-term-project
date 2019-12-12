@@ -18,7 +18,7 @@ def draw():
     clear_canvas()
     global Djbackground
     Djbackground.draw(400,300)
-    
+
     if int((makingtime - time.time()) %2 ) == 0:
         pressimage.draw(400,300)
     update_canvas()

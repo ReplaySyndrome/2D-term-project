@@ -6,6 +6,7 @@ import time
 from pico2d import *
 
 import game_framework
+import EndState
 
 
 name = "GameState"
@@ -211,21 +212,27 @@ class HPBar:
         global deltaTime
         self.reducehp -= deltaTime*self.reduce_speed
         if self.reducehp < -600:
-            print("End Game")
-            game_framework.pop_state()
+            #print("End Game")
+            #game_framework.pop_state()
+            game_framework.change_state(EndState)
 
 class Score:
     def __init__(self):
-        self.x = 700
+        self.x = 650
         self.y = 500
-        self.font = load_font('ENCR10B.TTF', 16)
+        self.font = load_font('ENCR10B.TTF', 32)
         self.currentscore = 0
 
     def draw(self):
         self.font.draw(self.x,self.y,str(self.currentscore),(255,255,0))
 
+    def getscore(self):
+        return self.currentscore
 
 
+def getlastscore():
+    global score
+    return score.getscore()
 
 
 
@@ -238,7 +245,7 @@ def enter():
     lastTime = time.time()
     cookie = Cookie()
     Jellies = list()
-    grounds =  list()
+    grounds = list()
 
     for i in range(100000):
         tempGround = Ground()
@@ -295,13 +302,13 @@ def handle_events():
 
             if event.key == SDLK_j:
                 cookie.slide = True
-                cookie.cookieheight = cookie.cookieheight /2
+                cookie.cookieheight = 48
                 print("PRESS J")
 
         elif event.type == SDL_KEYUP:
             if event.key == SDLK_j:
                 cookie.slide = False
-                cookie.cookieheight = cookie.cookieheight *2
+                cookie.cookieheight = 96
                 print("UP J")
 
 
