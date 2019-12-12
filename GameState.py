@@ -366,7 +366,7 @@ def draw():
             #print("remove far ground")
         elif ground.x - cookie.x >= 1000:
             break
-    print(cookie.x)
+    #print(cookie.x)
     hp_bar.draw()
     cookie.draw()
     score.draw()
