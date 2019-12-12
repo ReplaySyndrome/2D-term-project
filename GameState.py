@@ -101,7 +101,7 @@ class Cookie:
                                          self.width * 0.7, self.height * 0.7)
 
 
-        draw_rectangle(60-self.cookiewidth/2,self.y -self.cookieheight/2 - 40,60+self.cookiewidth/2,self.y+self.cookieheight/2 - 40)
+        #draw_rectangle(60-self.cookiewidth/2,self.y -self.cookieheight/2 - 40,60+self.cookiewidth/2,self.y+self.cookieheight/2 - 40)
 
     def get_bb(self):
         return self.x - self.cookiewidth/2 + 60,self.y - self.cookieheight/2 - 40,self.x + self.cookiewidth/2 + 60,self.y + self.cookieheight/2 - 40
@@ -119,7 +119,7 @@ class Jelly:
         global jellyImage
         global cookie
         jellyImage.clip_draw(68 * self.type ,0, 62 ,62,self.x - cookie.x,self.y + 23,30,30)
-        draw_rectangle(self.x - 15 - cookie.x,self.y - 15 + 25, self.x +15 - cookie.x , self.y + 15 + 25)
+        #draw_rectangle(self.x - 15 - cookie.x,self.y - 15 + 25, self.x +15 - cookie.x , self.y + 15 + 25)
 
     def setPos(self, x, y):
         self.x = x
@@ -160,7 +160,7 @@ class FlyingObstacle:
     def draw(self):
         global flyingObstacleImage
         flyingObstacleImage.clip_draw(self.width * int(self.frame),0,self.width,self.height,self.x - cookie.x,self.y)
-        draw_rectangle(self.x - cookie.x - 40,self.y - 28,self.x -cookie.x + 40 ,self.y + 28)
+        #draw_rectangle(self.x - cookie.x - 40,self.y - 28,self.x -cookie.x + 40 ,self.y + 28)
     def setPos(self,x,y):
         self.x = x
         self.y = y
@@ -252,11 +252,16 @@ def enter():
         tempGround.setPos(124*i,-20)
         grounds.append(tempGround)
 
+    jellymaker = False
+    jellymakercount = 0
 
     for i in range(100000):
         tempJelly = Jelly()
         if 240 <= (i*40 + 300) % 400 <= 320:
-            tempJelly.setPos(i * 40 + 300, 40)
+            if random.randint(0,5) >= 2:
+                tempJelly.setPos(i * 40 + 300, 300)
+            else:
+                tempJelly.setPos(i * 40 + 300, 40)
         else:
             tempJelly.setPos(i*40 + 300, 70)
         tempJelly.setType(random.randint(0, 24))

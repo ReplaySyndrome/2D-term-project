@@ -23,7 +23,7 @@ def draw():
 
     global showfont
     sc = GameState.getlastscore()
-    print(sc)
+    #print(sc)
 
     endbackground.draw(400,300,800,600)
     showfont.draw(400, 495, str(sc), (0, 56, 174))
